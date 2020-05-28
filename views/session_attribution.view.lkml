@@ -1,0 +1,1 @@
+view: session_attribution {}
