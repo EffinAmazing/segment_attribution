@@ -73,6 +73,7 @@ view: conversion_event {
 
   measure: count {
     type: count
+    label: "Number of Conversions"
   }
 
   measure: total_conversion_value {
