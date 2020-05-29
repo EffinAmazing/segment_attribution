@@ -11,13 +11,42 @@ view: sessions {
           event,
           id as event_id,
           mins_since_prev_event,
-          row_number() over (partition by visitor_id order by received_at) as session_num
+          row_number() over (partition by visitor_id order by received_at asc) as session_num,
+          lower(context_page_referrer) as referrer,
+          net.host(lower(context_page_referrer)) as referrer_host,
+          lower(context_campaign_name) as campaign_name,
+          lower(context_campaign_medium) as campaign_medium,
+          lower(context_campaign_source) as campaign_source
         from ${events.SQL_TABLE_NAME}
         where mins_since_prev_event > 30
         /* This WHERE statement can be adjusted: How many minutes of inactivity until a new session is started? */
       )
       select *,
-        visitor_id||'--sess'||cast(session_num as string) as id
+        visitor_id||'--sess'||cast(session_num as string) as id,
+        case
+          when referrer_host like '%@{site_domain}' then 'Internal'
+          when campaign_medium in ('ppc', 'cpc')
+            or referrer_host = 'googleads.g.doubleclick.net'
+            or referrer_host like '%googlesyndication.com'
+            then 'Paid'
+          when campaign_medium = 'email' then 'Email'
+          when (campaign_name is null and campaign_medium is null and campaign_source is null) then
+            case
+              when referrer is null then 'Direct'
+              when referrer_host like 'www.google.%'
+                or referrer_host = 'www.bing.com'
+                or referrer_host like '%search.yahoo.com'
+                or referrer_host = 'duckduckgo.com'
+                then 'Organic Search'
+              when referrer_host like '%facebook.com'
+                or referrer_host like '%instagram.com'
+                or referrer_host like '%youtube.com'
+                or referrer_host like '%pinterest.com'
+                then 'Organic Social'
+              when referrer is not null then 'Referral'
+            end
+          else 'Other'
+        end as channel
       from sessions
     ;;
   }
@@ -87,6 +116,43 @@ view: sessions {
   dimension: is_first_session {
     type: yesno
     sql: ${session_num} = 1 ;;
+  }
+
+  dimension: campaign_name {
+    type: string
+    sql: ${TABLE}.campaign_name ;;
+  }
+
+  dimension: campaign_medium {
+    type: string
+    sql: ${TABLE}.campaign_medium ;;
+  }
+
+  dimension: campaign_source {
+    type: string
+    sql: ${TABLE}.campaign_source ;;
+  }
+
+  dimension: has_campaign {
+    type: yesno
+    sql: ${campaign_medium} is not null
+      or ${campaign_name} is not null
+      or ${campaign_source} is not null ;;
+  }
+
+  dimension: referrer {
+    type: string
+    sql: ${TABLE}.referrer ;;
+  }
+
+  dimension: referrer_host {
+    type: string
+    sql: ${TABLE}.referrer_host ;;
+  }
+
+  dimension: channel {
+    type: string
+    sql: ${TABLE}.channel ;;
   }
 
 

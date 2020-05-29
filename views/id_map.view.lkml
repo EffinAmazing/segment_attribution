@@ -11,7 +11,6 @@ view: id_map {
         from ${identifies.SQL_TABLE_NAME}
         where user_id is not null
           and anonymous_id is not null
-        group by 1, 2
       )
       select *
       from i

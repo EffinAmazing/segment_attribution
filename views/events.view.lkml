@@ -15,7 +15,11 @@ view: events {
           user_id,
           received_at,
           anonymous_id,
-          event
+          event,
+          context_page_referrer,
+          context_campaign_name,
+          context_campaign_medium,
+          context_campaign_source
         from ${tracks.SQL_TABLE_NAME}
         union all
         select
@@ -23,15 +27,20 @@ view: events {
           user_id,
           received_at,
           anonymous_id,
-          'page' as event
+          'page' as event,
+          context_page_referrer,
+          context_campaign_name,
+          context_campaign_medium,
+          context_campaign_source
         from ${pages.SQL_TABLE_NAME}
       ),
       id_mapped_events as (
       --join the unioned track and pages with id_map to fill in user_id retroactively for identified users
         select e.id, e.received_at, e.anonymous_id, e.event,
+          context_page_referrer, context_campaign_name, context_campaign_medium, context_campaign_source,
           coalesce(e.user_id, i.user_id) as user_id,
           coalesce(e.user_id, i.user_id, e.anonymous_id) as visitor_id
-        from e
+        from events e
           left join ${id_map.SQL_TABLE_NAME} i
             on i.anonymous_id = e.anonymous_id
       )
