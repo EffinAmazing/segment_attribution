@@ -102,7 +102,7 @@ view: sessions {
 
   dimension_group: start {
     type: time
-    timeframes: [raw, time, date, month]
+    timeframes: [raw, time, date, week, month]
     description: "The time of the first event in this session."
     sql: ${TABLE}.received_at ;;
   }

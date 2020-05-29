@@ -78,6 +78,7 @@ view: conversion_event {
 
   measure: total_conversion_value {
     type: sum
+    value_format_name: usd_0
     sql: ${conversion_value} ;;
   }
 }
