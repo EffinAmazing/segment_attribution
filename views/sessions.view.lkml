@@ -18,11 +18,19 @@ view: sessions {
           lower(context_campaign_medium) as campaign_medium,
           lower(context_campaign_source) as campaign_source
         from ${events.SQL_TABLE_NAME}
+        /******
+        ** This WHERE statement can be adjusted
+        ** the default is 30 which means sessions are reset after 30 minutes of inactivity
+        *******/
         where mins_since_prev_event > 30
-        /* This WHERE statement can be adjusted: How many minutes of inactivity until a new session is started? */
       )
       select *,
         visitor_id||'--sess'||cast(session_num as string) as id,
+        /*******
+        ** The case statement below needs to be updated to match your definition of marketing channels
+        ** the logic here is used in Sessions and all children of sessions,
+        ** most importantly for this block the Channel are used in the conversion_attribution view and dashboard
+        ********/
         case
           when referrer_host like '%@{site_domain}' then 'Internal'
           when campaign_medium in ('ppc', 'cpc')

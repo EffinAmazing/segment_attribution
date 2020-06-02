@@ -126,6 +126,12 @@ view: conversion_attribution {
     sql: ${TABLE}.conversion_value ;;
   }
 
+  dimension: attributed_conversion_value {
+    type: number
+    value_format_name: usd
+    sql: ${conversion_value}*${attribution_credit} ;;
+  }
+
   measure: share_of_conversions {
     type: sum
     value_format_name: decimal_1
@@ -135,7 +141,7 @@ view: conversion_attribution {
   measure: share_of_revenue {
     type: sum
     value_format_name: usd_0
-    sql: ${conversion_value} ;;
+    sql: ${attributed_conversion_value} ;;
   }
 
 }
