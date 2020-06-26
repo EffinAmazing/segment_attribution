@@ -13,6 +13,7 @@ view: sessions {
           mins_since_prev_event,
           row_number() over (partition by visitor_id order by received_at asc) as session_num,
           lower(context_page_referrer) as referrer,
+          context_page_url as url,
           net.host(lower(context_page_referrer)) as referrer_host,
           lower(context_campaign_name) as campaign_name,
           lower(context_campaign_medium) as campaign_medium,
@@ -32,12 +33,14 @@ view: sessions {
         ** most importantly for this block the Channel are used in the conversion_attribution view and dashboard
         ********/
         case
-          when referrer_host like '%@{site_domain}' then 'Internal'
           when campaign_medium in ('ppc', 'cpc')
             or referrer_host = 'googleads.g.doubleclick.net'
             or referrer_host like '%googlesyndication.com'
+            or url like '%fbclid%'
+            or url like '%gclid%'
             then 'Paid'
           when campaign_medium = 'email' then 'Email'
+          when referrer_host like '%@{site_domain}' then 'Internal'
           when (campaign_name is null and campaign_medium is null and campaign_source is null) then
             case
               when referrer is null then 'Direct'

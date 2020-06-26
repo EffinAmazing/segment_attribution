@@ -16,6 +16,7 @@ view: events {
           received_at,
           anonymous_id,
           event,
+          context_page_url,
           context_page_referrer,
           context_campaign_name,
           context_campaign_medium,
@@ -28,6 +29,7 @@ view: events {
           received_at,
           anonymous_id,
           'page' as event,
+          context_page_url,
           context_page_referrer,
           context_campaign_name,
           context_campaign_medium,
@@ -36,7 +38,7 @@ view: events {
       ),
       id_mapped_events as (
       --join the unioned track and pages with id_map to fill in user_id retroactively for identified users
-        select e.id, e.received_at, e.anonymous_id, e.event,
+        select e.id, e.received_at, e.anonymous_id, e.event, context_page_url,
           context_page_referrer, context_campaign_name, context_campaign_medium, context_campaign_source,
           coalesce(e.user_id, i.user_id) as user_id,
           coalesce(e.user_id, i.user_id, e.anonymous_id) as visitor_id

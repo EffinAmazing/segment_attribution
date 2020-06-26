@@ -1,7 +1,39 @@
-- dashboard: attribution
+
+- dashboard: attribution_dash
   title: Attribution
   layout: newspaper
   elements:
+  - title: Number of Conversions
+    name: Number of Conversions
+    model: attribution
+    explore: conversion_attribution
+    type: single_value
+    fields: [conversion_attribution.share_of_conversions]
+    filters: {}
+    limit: 500
+    query_timezone: America/Los_Angeles
+    custom_color_enabled: true
+    show_single_value_title: true
+    show_comparison: false
+    comparison_type: value
+    comparison_reverse_colors: false
+    show_comparison_label: true
+    enable_conditional_formatting: false
+    conditional_formatting_include_totals: false
+    conditional_formatting_include_nulls: false
+    value_format: "#,###"
+    conditional_formatting: [{type: equal to, value: !!null '', background_color: "#62bad4",
+        font_color: !!null '', color_application: {collection_id: legacy, palette_id: legacy_sequential3},
+        bold: false, italic: false, strikethrough: false, fields: !!null ''}]
+    defaults_version: 1
+    listen:
+      Date Range: conversion_event.received_date
+      Attribution Model: conversion_attribution.attribution_model
+      Channel: sessions.channel
+    row: 0
+    col: 12
+    width: 4
+    height: 5
   - title: Value of Conversions
     name: Value of Conversions
     model: attribution
@@ -91,7 +123,8 @@
     explore: sessions
     type: looker_line
     fields: [sessions.count, sessions.count_first_session, sessions.start_week]
-    fill_fields: [sessions.start_week]
+    filters:
+      sessions.start_week: before 0 weeks ago
     sorts: [sessions.start_week desc]
     limit: 500
     x_axis_gridlines: false
@@ -151,8 +184,9 @@
     type: looker_line
     fields: [conversion_event.received_week, conversion_event.total_conversion_value,
       conversion_event.count]
-    fill_fields: [conversion_event.received_week]
-    filters: {}
+    filters:
+      conversion_event.received_week: before 0 weeks ago
+    sorts: [conversion_event.received_week desc]
     limit: 500
     query_timezone: America/Los_Angeles
     x_axis_gridlines: false
@@ -218,7 +252,7 @@
     type: looker_column
     fields: [sessions.count, sessions.count_first_session, sessions.start_month]
     fill_fields: [sessions.start_month]
-    sorts: [sessions.start_month desc]
+    sorts: [sessions.start_month]
     limit: 500
     x_axis_gridlines: false
     y_axis_gridlines: true
@@ -351,120 +385,6 @@
     col: 8
     width: 8
     height: 7
-  - title: Number of Conversions
-    name: Number of Conversions
-    model: attribution
-    explore: conversion_attribution
-    type: single_value
-    fields: [conversion_attribution.share_of_conversions]
-    filters: {}
-    limit: 500
-    query_timezone: America/Los_Angeles
-    custom_color_enabled: true
-    show_single_value_title: true
-    show_comparison: false
-    comparison_type: value
-    comparison_reverse_colors: false
-    show_comparison_label: true
-    enable_conditional_formatting: false
-    conditional_formatting_include_totals: false
-    conditional_formatting_include_nulls: false
-    value_format: "#,###"
-    conditional_formatting: [{type: equal to, value: !!null '', background_color: "#62bad4",
-        font_color: !!null '', color_application: {collection_id: legacy, palette_id: legacy_sequential3},
-        bold: false, italic: false, strikethrough: false, fields: !!null ''}]
-    defaults_version: 1
-    listen:
-      Date Range: conversion_event.received_date
-      Attribution Model: conversion_attribution.attribution_model
-      Channel: sessions.channel
-    row: 0
-    col: 12
-    width: 4
-    height: 5
-  - name: Overall Site Conversion Rate
-    title: Overall Site Conversion Rate
-    merged_queries:
-    - model: attribution
-      explore: sessions
-      type: single_value
-      fields: [sessions.count, sessions.channel]
-      filters:
-        sessions.start_date: 7 days
-      limit: 500
-      total: true
-      custom_color_enabled: true
-      show_single_value_title: true
-      show_comparison: false
-      comparison_type: value
-      comparison_reverse_colors: false
-      show_comparison_label: true
-      enable_conditional_formatting: false
-      conditional_formatting_include_totals: false
-      conditional_formatting_include_nulls: false
-      defaults_version: 1
-    - model: attribution
-      explore: conversion_attribution
-      type: table
-      fields: [sessions.channel, conversion_attribution.share_of_conversions]
-      filters:
-        conversion_event.received_date: 7 days
-        conversion_attribution.attribution_model: last
-      limit: 500
-      total: true
-      query_timezone: America/Los_Angeles
-      join_fields:
-      - field_name: sessions.channel
-        source_field_name: sessions.channel
-    type: single_value
-    series_types: {}
-    hidden_fields: [sessions.count, conversion_attribution.share_of_conversions]
-    sorts: [sessions.channel]
-    total: true
-    dynamic_fields: [{table_calculation: overall_conv_rate, label: Overall Conv Rate,
-        expression: 'sum(${conversion_attribution.share_of_conversions})/sum(${sessions.count})',
-        value_format: !!null '', value_format_name: percent_1, _kind_hint: measure,
-        _type_hint: number}]
-    listen:
-    - Date Range: sessions.start_date
-      Channel: sessions.channel
-    - Date Range: conversion_event.received_date
-      Attribution Model: conversion_attribution.attribution_model
-      Channel: sessions.channel
-    row: 0
-    col: 8
-    width: 4
-    height: 5
-  - title: Average Conversion Value
-    name: Average Conversion Value
-    model: attribution
-    explore: conversion_attribution
-    type: single_value
-    fields: [conversion_attribution.share_of_conversions, conversion_attribution.share_of_revenue]
-    filters: {}
-    limit: 500
-    dynamic_fields: [{table_calculation: avg_conv_value, label: Avg Conv Value, expression: "${conversion_attribution.share_of_revenue}/${conversion_attribution.share_of_conversions}",
-        value_format: !!null '', value_format_name: usd_0, _kind_hint: measure, _type_hint: number}]
-    query_timezone: America/Los_Angeles
-    custom_color_enabled: true
-    show_single_value_title: true
-    show_comparison: false
-    comparison_type: value
-    comparison_reverse_colors: false
-    show_comparison_label: true
-    enable_conditional_formatting: false
-    conditional_formatting_include_totals: false
-    conditional_formatting_include_nulls: false
-    defaults_version: 1
-    hidden_fields: [conversion_attribution.share_of_revenue, conversion_attribution.share_of_conversions]
-    listen:
-      Date Range: conversion_event.received_date
-      Attribution Model: conversion_attribution.attribution_model
-      Channel: sessions.channel
-    row: 0
-    col: 20
-    width: 4
-    height: 5
   - title: Conversions by Channel
     name: Conversions by Channel
     model: attribution
@@ -478,7 +398,7 @@
           Value per Conversion, expression: "${conversion_attribution.share_of_revenue}/${conversion_attribution.share_of_conversions}",
         value_format: !!null '', value_format_name: usd_0, _kind_hint: measure, _type_hint: number}]
     show_view_names: false
-    show_row_numbers: true
+    show_row_numbers: false
     transpose: false
     truncate_text: true
     hide_totals: false
@@ -575,7 +495,7 @@
         expression: "${sessions.count_first_session}/${sessions.count}", value_format: !!null '',
         value_format_name: percent_0, _kind_hint: measure, _type_hint: number}]
     show_view_names: false
-    show_row_numbers: true
+    show_row_numbers: false
     transpose: false
     truncate_text: true
     hide_totals: false
@@ -660,6 +580,86 @@
     col: 0
     width: 8
     height: 6
+  - name: Overall Site Conversion Rate
+    title: Overall Site Conversion Rate
+    merged_queries:
+    - model: attribution
+      explore: sessions
+      type: single_value
+      fields: [sessions.count, sessions.channel]
+      filters: {}
+      limit: 500
+      total: true
+      custom_color_enabled: true
+      show_single_value_title: true
+      show_comparison: false
+      comparison_type: value
+      comparison_reverse_colors: false
+      show_comparison_label: true
+      enable_conditional_formatting: false
+      conditional_formatting_include_totals: false
+      conditional_formatting_include_nulls: false
+      defaults_version: 1
+    - model: attribution
+      explore: conversion_attribution
+      type: table
+      fields: [sessions.channel, conversion_attribution.share_of_conversions]
+      filters: {}
+      limit: 500
+      total: true
+      query_timezone: America/Los_Angeles
+      join_fields:
+      - field_name: sessions.channel
+        source_field_name: sessions.channel
+    type: single_value
+    series_types: {}
+    hidden_fields: [sessions.count, conversion_attribution.share_of_conversions]
+    sorts: [sessions.channel]
+    total: true
+    dynamic_fields: [{table_calculation: overall_conv_rate, label: Overall Conv Rate,
+        expression: 'sum(${conversion_attribution.share_of_conversions})/sum(${sessions.count})',
+        value_format: !!null '', value_format_name: percent_1, _kind_hint: measure,
+        _type_hint: number}]
+    listen:
+    - Date Range: sessions.start_date
+      Channel: sessions.channel
+    - Date Range: conversion_event.received_date
+      Attribution Model: conversion_attribution.attribution_model
+      Channel: sessions.channel
+    row: 0
+    col: 8
+    width: 4
+    height: 5
+  - title: Average Conversion Value
+    name: Average Conversion Value
+    model: attribution
+    explore: conversion_attribution
+    type: single_value
+    fields: [conversion_attribution.share_of_conversions, conversion_attribution.share_of_revenue]
+    filters: {}
+    limit: 500
+    dynamic_fields: [{table_calculation: avg_conv_value, label: Avg Conv Value, expression: "${conversion_attribution.share_of_revenue}/${conversion_attribution.share_of_conversions}",
+        value_format: !!null '', value_format_name: usd_0, _kind_hint: measure, _type_hint: number}]
+    query_timezone: America/Los_Angeles
+    custom_color_enabled: true
+    show_single_value_title: true
+    show_comparison: false
+    comparison_type: value
+    comparison_reverse_colors: false
+    show_comparison_label: true
+    enable_conditional_formatting: false
+    conditional_formatting_include_totals: false
+    conditional_formatting_include_nulls: false
+    defaults_version: 1
+    hidden_fields: [conversion_attribution.share_of_revenue, conversion_attribution.share_of_conversions]
+    listen:
+      Date Range: conversion_event.received_date
+      Attribution Model: conversion_attribution.attribution_model
+      Channel: sessions.channel
+    row: 0
+    col: 20
+    width: 4
+    height: 5
   - name: Weekly Conversion Rate & Revenue per Session
     title: Weekly Conversion Rate & Revenue per Session
     merged_queries:
@@ -668,6 +668,8 @@
       type: looker_line
       fields: [sessions.start_week, sessions.count]
       fill_fields: [sessions.start_week]
+      filters:
+        sessions.start_week: before 0 weeks ago
       sorts: [sessions.start_week desc]
       limit: 500
       x_axis_gridlines: false
@@ -720,8 +722,7 @@
       fields: [conversion_event.received_week, conversion_attribution.share_of_conversions,
         conversion_attribution.share_of_revenue]
       fill_fields: [conversion_event.received_week]
-      filters:
-        conversion_attribution.attribution_model: first
+      filters: {}
       sorts: [conversion_event.received_week desc]
       limit: 500
       query_timezone: America/Los_Angeles
@@ -773,12 +774,6 @@
         _type_hint: number}, {table_calculation: revenue_per_session, label: Revenue
           per Session, expression: "${conversion_attribution.share_of_revenue}/${sessions.count}",
         value_format: !!null '', value_format_name: usd_0, _kind_hint: measure, _type_hint: number}]
-    listen:
-    - Date Range: sessions.start_date
-      Channel: sessions.channel
-    - Date Range: conversion_event.received_date
-      Attribution Model: conversion_attribution.attribution_model
-      Channel: sessions.channel
     row: 11
     col: 16
     width: 8
@@ -842,8 +837,7 @@
       fields: [conversion_attribution.share_of_conversions, conversion_attribution.share_of_revenue,
         conversion_event.received_month]
       fill_fields: [conversion_event.received_month]
-      filters:
-        conversion_attribution.attribution_model: first
+      filters: {}
       limit: 500
       query_timezone: America/Los_Angeles
       join_fields:
@@ -914,10 +908,7 @@
       explore: sessions
       type: looker_grid
       fields: [sessions.count, sessions.channel]
-      filters:
-        sessions.start_date: 30 days
-        sessions.channel: Direct,Email,Organic Search,Other,Referral,Internal,Paid,Organic
-          Social
+      filters: {}
       sorts: [sessions.count desc]
       limit: 500
       column_limit: 50
@@ -1003,9 +994,7 @@
       explore: conversion_attribution
       type: table
       fields: [sessions.channel, conversion_attribution.share_of_conversions, conversion_attribution.share_of_revenue]
-      filters:
-        conversion_event.received_date: 30 days
-        conversion_attribution.attribution_model: first
+      filters: {}
       sorts: [conversion_attribution.share_of_conversions desc]
       limit: 500
       query_timezone: America/Los_Angeles
@@ -1016,7 +1005,7 @@
     show_totals: true
     show_row_totals: true
     show_view_names: false
-    show_row_numbers: true
+    show_row_numbers: false
     transpose: false
     truncate_text: true
     size_to_fit: true

@@ -1,16 +1,17 @@
+project_name: "attribution"
 
 constant: segment_schema_name {
-  value: "shopify_littledata"
+  value: "your_segment_schema"
 }
 
 constant: conversion_event {
-  value: "order_completed"
+  value: "your_conversion_event_slug"
 }
 
 constant: conversion_value {
-  value: "total"
+  value: "your_conversion_value_field"
 }
 
 constant: site_domain {
-  value: "southerntide.com"
+  value: "your_domain.com"
 }

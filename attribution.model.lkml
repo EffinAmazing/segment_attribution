@@ -1,6 +1,7 @@
 connection: "st"
 
 include: "/views/*.view.lkml"
+include: "*.dashboard"
 
 explore: sessions {}
 
