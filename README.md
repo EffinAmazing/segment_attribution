@@ -6,7 +6,7 @@ This block is designed to be used with Segment data collected through the client
 2. Update the logic for bucketing Sessions into Channels in the derived table in the [sessions view](/projects/attribution/files/views/sessions.view.lkml).
 3. Adjust the session timeout period in the derived table in the [sessions view](/projects/attribution/files/views/sessions.view.lkml), the default is 30 minutes of inactivity to create a new session.
 4. Add your own custom attribution models to the [conversion_attribution](/projects/attribution/files/views/conversion_attribution.view.lkml) view, the default models include first-touch, last-touch, linear, time-decay, and 40-20-40 (models explained in detail below).
-5. Open the Attribution dashboard to see your data populated and adjust the queries, visuals, and filters as you see fit.
+5. Open the [Attribution dashboard](/dashboards/attribution::attribution_dash) to see your data populated and adjust the queries, visuals, and filters as you see fit.
 
 ## Notes about this block
 
