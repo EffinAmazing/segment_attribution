@@ -44,3 +44,5 @@ y<sub>session 2</sub> / (y<sub>session 1</sub> + y<sub>session 2</sub> + y<sub>s
 ### 40-20-40
 
 The first session in the attribution lookback window gets 40% of the credit, the conversion session gets 40% of the credit and the remaining 20% credit gets divided across all other sessions. If there are 2 sessions, each get 50% credit.
+
+You can see the screenshots of the explore and default dashboard in the [Looker blocks directory](https://looker.com/platform/blocks/source/multi-touch-attribution-by-segment).
